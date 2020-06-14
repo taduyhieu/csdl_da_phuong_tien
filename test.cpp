@@ -55,20 +55,19 @@ cv::Mat hand(string src) {
 	cv::Mat origin_img, img, img_pad, img_d;
 	int start_i, end_i, start_j, end_j;
 
-	// doc anh ve dang grayscale va resize 512x512
+	// doc anh
 	origin_img = imread(src);
 	if (!origin_img.data)
 	{
 		cout << "Could not open the image" << endl;
 	}
+	//resize ve kich thuoc 512x512
 	cv::Mat img_resize = GetSquareImage(origin_img, 512);
-
+	//chuyen anh RGB thanh grayscale
 	cv::cvtColor(img_resize, img, cv::COLOR_BGR2GRAY);
-	//cv::resize(origin_img, img, cv::Size(512, 512));
 
 	// chuyen cac gia tri muc xam ve 0 -> 1
 	img.convertTo(img_d, CV_64FC1, 1.0 / 255.0);
-
 	// tao vien cho anh
 	cv::copyMakeBorder(img_d, img_pad, 1, 1, 1, 1, BORDER_REPLICATE);
 
@@ -78,10 +77,8 @@ cv::Mat hand(string src) {
 	cv::Mat dxy = Mat::zeros(img_pad.rows - 2, img_pad.cols - 2, CV_64FC1);
 	cv::Mat theta = Mat::zeros(img_pad.rows - 2, img_pad.cols - 2, CV_64FC1);
 
-	for (int i = 1; i < img_pad.rows - 1; i++)
-	{
-		for (int j = 1; j < img_pad.cols - 1; j++)
-		{
+	for (int i = 1; i < img_pad.rows - 1; i++){
+		for (int j = 1; j < img_pad.cols - 1; j++){
 			dx.at<double>(i - 1, j - 1) = -1 * img_pad.at<double>(i, j - 1) + img_pad.at<double>(i, j + 1);
 			dy.at<double>(i - 1, j - 1) = -1 * img_pad.at<double>(i - 1, j) + img_pad.at<double>(i + 1, j);
 			dxy.at<double>(i - 1, j - 1) = sqrt(pow(dx.at<double>(i - 1, j - 1), 2) + pow(dy.at<double>(i - 1, j - 1), 2));
@@ -103,12 +100,9 @@ cv::Mat hand(string src) {
 	int cell_countj = floor(col / cellSize);
 	int size[3] = { cell_counti, cell_countj, 9 };
 	cv::Mat orient_bin(3, size, CV_64FC1, cv::Scalar(0));
-	for (int cell_i = 0; cell_i < cell_counti; cell_i++)
-	{
-		for (int cell_j = 0; cell_j < cell_countj; cell_j++)
-		{
-			for (int bin = 0; bin < 9; bin++)
-			{
+	for (int cell_i = 0; cell_i < cell_counti; cell_i++){
+		for (int cell_j = 0; cell_j < cell_countj; cell_j++){
+			for (int bin = 0; bin < 9; bin++){
 				// hang bat dau cua 1 cell
 				start_i = (cell_i)*cellSize;
 				// hag ket thuc cua 1 cell
@@ -120,10 +114,8 @@ cv::Mat hand(string src) {
 
 				cv::Mat temp = Mat::zeros(end_i - start_i + 1, end_j - start_j + 1, CV_64FC1);
 
-				for (int i = start_i; i <= end_i; i++)
-				{
-					for (int j = start_j; j <= end_j; j++)
-					{		
+				for (int i = start_i; i <= end_i; i++){
+					for (int j = start_j; j <= end_j; j++){		
 						if (theta.at<double>(i, j) >= bin*bin_size && theta.at<double>(i, j) < (bin + 1)*bin_size) {
 							temp.at<double>(i - start_i, j - start_j) = ((bin + 1) * bin_size - theta.at<double>(i, j)) / bin_size;
 						}
@@ -236,21 +228,10 @@ double calDistanceNorm(cv::Mat feature_first, cv::Mat feature_second) {
 	}
 	return distance;
 }
+
+
 int main(int argc, char* argv[])
 {
-	/*cv::Mat img_cvt;
-	cv::Mat img = imread("dog.jpg");
-	
-	cv::Mat img_resize = GetSquareImage(img, 512);
-	cout << img_resize.size() << endl;
-
-	cv::cvtColor(img_resize, img_cvt, cv::COLOR_BGR2GRAY); */
-
-	/*namedWindow("Display window", WINDOW_AUTOSIZE);// Create a window for display.
-	imshow("Display window", img_resize);
-	imshow("Display window", img_cvt);
-	waitKey(0);
-	return 0; */
 	label trainArray[100];
 	label temp;
 	int N = 30; // so anh cua moi nhan
@@ -266,7 +247,7 @@ int main(int argc, char* argv[])
 		cout << "Nhap lua chon :";
 		cin >> type;
 		if (type == 1) {
-			cout << "Dang tinh dac trung cua anh dau vao...." << endl;
+			cout << "Dang tinh dac trung cua anh dau vao và luu vao file...." << endl;
 			for (int i = 0; i < N; i++) {
 				feature = hand("train/images/cat." + to_string(i + 1) + ".jpg");
 				writeFeature("train/features/cat." + to_string(i + 1) + ".yml", feature);
@@ -284,11 +265,13 @@ int main(int argc, char* argv[])
 		else if (type == 2) {
 			do {
 				int compare_type;
+				int correct = 0;
+				
 				cout << "Nhap file anh test : ";
 				cin >> src_test;
-				cout << "Chon cong thuc so sanh anh" << endl;
 				cout << "1. Normal | 2. L2Norm | 3.Cosin" << endl;
-				cin >> compare_type ;
+				cout << "Chon cong thuc so sanh anh" << endl;
+				cin >> compare_type;
 				cout << "Dang du doan. Vui long cho!" << endl;
 				feature_test = hand("test/images/" + src_test);
 				for (int i = 0; i < N; i++) {
@@ -297,13 +280,14 @@ int main(int argc, char* argv[])
 					trainArray[i].label = 1;
 					if (compare_type == 1) {
 						trainArray[i].distance = calDistanceNorm(feature, feature_test);
-					} else if (compare_type == 2) {
+					}
+					else if (compare_type == 2) {
 						trainArray[i].distance = calDistanceL2Norm(feature, feature_test);
 					}
 					else if (compare_type == 3) {
 						trainArray[i].distance = calCosin(feature, feature_test);
 					}
-					
+
 				}
 				for (int i = 0; i < N; i++) {
 					feature = readFeature("train/features/dog." + to_string(i + 1) + ".yml");
@@ -355,9 +339,8 @@ int main(int argc, char* argv[])
 						}
 					}
 				}
-				
 
-				/*for (int i = 0; i < 3*N; i++) {
+				/*for (int i = 0; i < 3 * N; i++) {
 					cout << trainArray[i].distance << "    ; " << trainArray[i].label << endl;
 				}*/
 
@@ -375,7 +358,6 @@ int main(int argc, char* argv[])
 						chicken_predict++;
 					}
 				}
-
 				if (cat_predict >= dog_predict && cat_predict >= chicken_predict) {
 					cout << "Du doan la meo" << endl;
 				}
@@ -385,11 +367,10 @@ int main(int argc, char* argv[])
 				else if (chicken_predict >= cat_predict && chicken_predict >= dog_predict) {
 					cout << "Du doan la ga" << endl;
 				}
-				cout << "Nhap lua chon :";
+				cout << "Nhap lua chon : " << endl;
 				cin >> type;
 			} while (type != 0);
 		}
 	} while (type != 0);
-	
 	return 0;
 }
