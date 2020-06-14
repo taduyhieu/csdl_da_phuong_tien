@@ -1,0 +1,2 @@
+D:\DPT\HOG_CNN\test\Debug\test.exe
+D:\DPT\HOG_CNN\test\Debug\test.pdb

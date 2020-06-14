@@ -1,0 +1,10 @@
+D:\DPT\HOG_CNN\test\x64\Debug\test.exe
+D:\DPT\HOG_CNN\test\x64\Debug\test.pdb
+D:\DPT\HOG_CNN\HOG\x64\Debug\test.exe
+D:\DPT\HOG_CNN\HOG\x64\Debug\test.pdb
+D:\DPT\hog_feature\x64\Debug\test.exe
+D:\DPT\hog_feature\x64\Debug\test.pdb
+F:\backup D\DPT\hog_feature\x64\Debug\test.exe
+F:\backup D\DPT\hog_feature\x64\Debug\test.pdb
+H:\csdl_da_phuong_tien\x64\Debug\test.exe
+H:\csdl_da_phuong_tien\x64\Debug\test.pdb
