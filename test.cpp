@@ -24,6 +24,90 @@ bool IsNumber(double x)
 	return (x == x);
 }
 
+cv::Mat CropImage(cv::Mat img) {
+	//cv::Mat img = cv::imread(src);
+	int start_x, start_y, end_x, end_y;
+	bool check = true;
+	for (int i = 0; i < img.rows; i++) {
+		for (int j = 0; j < img.cols; j++) {
+			int x = (int)img.at<Vec3b>(i, j).val[0];
+			int y = (int)img.at<Vec3b>(i, j).val[1];
+			int z = (int)img.at<Vec3b>(i, j).val[2];
+			if (!(x == 255 && y == 255 && z == 255)) {
+				start_x = i;
+				check = false;
+			}
+			if (!check) {
+				break;
+			}
+		}
+		if (!check) {
+			break;
+		}
+	}
+
+	check = true;
+	for (int j = 0; j < img.cols; j++) {
+		for (int i = 0; i < img.rows; i++) {
+			int x = (int)img.at<Vec3b>(i, j).val[0];
+			int y = (int)img.at<Vec3b>(i, j).val[1];
+			int z = (int)img.at<Vec3b>(i, j).val[2];
+			if (!(x == 255 && y == 255 && z == 255)) {
+				start_y = j;
+				check = false;
+			}
+			if (!check) {
+				break;
+			}
+		}
+		if (!check) {
+			break;
+		}
+	}
+
+	check = true;
+	for (int i = img.rows - 1; i >= 0; i--) {
+		for (int j = img.cols - 1; j >= 0; j--) {
+			int x = (int)img.at<Vec3b>(i, j).val[0];
+			int y = (int)img.at<Vec3b>(i, j).val[1];
+			int z = (int)img.at<Vec3b>(i, j).val[2];
+			if (!(x == 255 && y == 255 && z == 255)) {
+				end_x = i;
+				check = false;
+			}
+			if (!check) {
+				break;
+			}
+		}
+		if (!check) {
+			break;
+		}
+	}
+
+	check = true;
+	for (int j = img.cols - 1; j >= 0; j--) {
+		for (int i = img.rows - 1; i >= 0; i--) {
+			int x = (int)img.at<Vec3b>(i, j).val[0];
+			int y = (int)img.at<Vec3b>(i, j).val[1];
+			int z = (int)img.at<Vec3b>(i, j).val[2];
+			if (!(x == 255 && y == 255 && z == 255)) {
+				end_y = j;
+				check = false;
+			}
+			if (!check) {
+				break;
+			}
+		}
+		if (!check) {
+			break;
+		}
+	}
+	cv::Mat ROI(img, cv::Rect(start_y, start_x, end_y - start_y, end_x - start_x));
+	cv::Mat croppedImage;
+	// Copy the data into new matrix
+	ROI.copyTo(croppedImage);
+	return croppedImage;
+}
 
 cv::Mat GetSquareImage(const cv::Mat& img, int target_width = 512)
 {
@@ -61,8 +145,10 @@ cv::Mat hand(string src) {
 	{
 		cout << "Could not open the image" << endl;
 	}
+	//crop image
+	cv::Mat img_cropped = CropImage(origin_img);
 	//resize ve kich thuoc 512x512
-	cv::Mat img_resize = GetSquareImage(origin_img, 512);
+	cv::Mat img_resize = GetSquareImage(img_cropped, 512);
 	//chuyen anh RGB thanh grayscale
 	cv::cvtColor(img_resize, img, cv::COLOR_BGR2GRAY);
 
@@ -232,6 +318,12 @@ double calDistanceNorm(cv::Mat feature_first, cv::Mat feature_second) {
 
 int main(int argc, char* argv[])
 {
+	/*hand("chicken.11.jpg");
+	return 0;*/
+	//namedWindow("Display window", WINDOW_AUTOSIZE);// Create a window for display.
+	//imshow("Display window", croppedImage);
+	//waitKey(0);
+	//return 0;
 	label trainArray[100];
 	label temp;
 	int N = 30; // so anh cua moi nhan
@@ -266,109 +358,123 @@ int main(int argc, char* argv[])
 			do {
 				int compare_type;
 				int correct = 0;
-				
-				cout << "Nhap file anh test : ";
-				cin >> src_test;
 				cout << "1. Normal | 2. L2Norm | 3.Cosin" << endl;
 				cout << "Chon cong thuc so sanh anh" << endl;
 				cin >> compare_type;
 				cout << "Dang du doan. Vui long cho!" << endl;
-				feature_test = hand("test/images/" + src_test);
-				for (int i = 0; i < N; i++) {
-					feature = readFeature("train/features/cat." + to_string(i + 1) + ".yml");
-					trainArray[i].feature = feature;
-					trainArray[i].label = 1;
-					if (compare_type == 1) {
-						trainArray[i].distance = calDistanceNorm(feature, feature_test);
-					}
-					else if (compare_type == 2) {
-						trainArray[i].distance = calDistanceL2Norm(feature, feature_test);
-					}
-					else if (compare_type == 3) {
-						trainArray[i].distance = calCosin(feature, feature_test);
-					}
+				for (int iii = 1; iii <= 15; iii++) {
+					
+					/*cout << "Nhap file anh test : ";
+					cin >> src_test;*/
+					
+					src_test = to_string(iii) + ".jpg";
+					feature_test = hand("test/images/" + src_test);
+					for (int i = 0; i < N; i++) {
+						feature = readFeature("train/features/cat." + to_string(i + 1) + ".yml");
+						trainArray[i].feature = feature;
+						trainArray[i].label = 1;
+						if (compare_type == 1) {
+							trainArray[i].distance = calDistanceNorm(feature, feature_test);
+						}
+						else if (compare_type == 2) {
+							trainArray[i].distance = calDistanceL2Norm(feature, feature_test);
+						}
+						else if (compare_type == 3) {
+							trainArray[i].distance = calCosin(feature, feature_test);
+						}
 
-				}
-				for (int i = 0; i < N; i++) {
-					feature = readFeature("train/features/dog." + to_string(i + 1) + ".yml");
-					trainArray[i + N].feature = feature;
-					trainArray[i + N].label = 2;
-					if (compare_type == 1) {
-						trainArray[i + N].distance = calDistanceNorm(feature, feature_test);
 					}
-					else if (compare_type == 2) {
-						trainArray[i + N].distance = calDistanceL2Norm(feature, feature_test);
+					for (int i = 0; i < N; i++) {
+						feature = readFeature("train/features/dog." + to_string(i + 1) + ".yml");
+						trainArray[i + N].feature = feature;
+						trainArray[i + N].label = 2;
+						if (compare_type == 1) {
+							trainArray[i + N].distance = calDistanceNorm(feature, feature_test);
+						}
+						else if (compare_type == 2) {
+							trainArray[i + N].distance = calDistanceL2Norm(feature, feature_test);
+						}
+						else if (compare_type == 3) {
+							trainArray[i + N].distance = calCosin(feature, feature_test);
+						}
 					}
-					else if (compare_type == 3) {
-						trainArray[i + N].distance = calCosin(feature, feature_test);
+					for (int i = 0; i < N; i++) {
+						feature = readFeature("train/features/chicken." + to_string(i + 1) + ".yml");
+						trainArray[i + 2 * N].feature = feature;
+						trainArray[i + 2 * N].label = 3;
+						if (compare_type == 1) {
+							trainArray[i + 2 * N].distance = calDistanceNorm(feature, feature_test);
+						}
+						else if (compare_type == 2) {
+							trainArray[i + 2 * N].distance = calDistanceL2Norm(feature, feature_test);
+						}
+						else if (compare_type == 3) {
+							trainArray[i + 2 * N].distance = calCosin(feature, feature_test);
+						}
 					}
-				}
-				for (int i = 0; i < N; i++) {
-					feature = readFeature("train/features/chicken." + to_string(i + 1) + ".yml");
-					trainArray[i + 2 * N].feature = feature;
-					trainArray[i + 2 * N].label = 3;
-					if (compare_type == 1) {
-						trainArray[i + 2 * N].distance = calDistanceNorm(feature, feature_test);
-					}
-					else if (compare_type == 2) {
-						trainArray[i + 2 * N].distance = calDistanceL2Norm(feature, feature_test);
-					}
-					else if (compare_type == 3) {
-						trainArray[i + 2 * N].distance = calCosin(feature, feature_test);
-					}
-				}
-				if (compare_type == 1 || compare_type == 2) {
-					for (int i = 0; i < 3 * N - 1; i++) {
-						for (int j = i + 1; j < 3 * N; j++) {
-							if (trainArray[i].distance >= trainArray[j].distance) {
-								temp = trainArray[i];
-								trainArray[i] = trainArray[j];
-								trainArray[j] = temp;
+					if (compare_type == 1 || compare_type == 2) {
+						for (int i = 0; i < 3 * N - 1; i++) {
+							for (int j = i + 1; j < 3 * N; j++) {
+								if (trainArray[i].distance >= trainArray[j].distance) {
+									temp = trainArray[i];
+									trainArray[i] = trainArray[j];
+									trainArray[j] = temp;
+								}
 							}
 						}
 					}
-				}
-				else if (compare_type == 3) {
-					for (int i = 0; i < 3 * N - 1; i++) {
-						for (int j = i + 1; j < 3 * N; j++) {
-							if (trainArray[i].distance <= trainArray[j].distance) {
-								temp = trainArray[i];
-								trainArray[i] = trainArray[j];
-								trainArray[j] = temp;
+					else if (compare_type == 3) {
+						for (int i = 0; i < 3 * N - 1; i++) {
+							for (int j = i + 1; j < 3 * N; j++) {
+								if (trainArray[i].distance <= trainArray[j].distance) {
+									temp = trainArray[i];
+									trainArray[i] = trainArray[j];
+									trainArray[j] = temp;
+								}
 							}
 						}
 					}
-				}
 
-				/*for (int i = 0; i < 3 * N; i++) {
-					cout << trainArray[i].distance << "    ; " << trainArray[i].label << endl;
-				}*/
+					/*for (int i = 0; i < 3 * N; i++) {
+						cout << trainArray[i].distance << "    ; " << trainArray[i].label << endl;
+					}*/
 
-				int cat_predict = 0;
-				int dog_predict = 0;
-				int chicken_predict = 0;
-				for (int i = 0; i < 10; i++) {
-					if (trainArray[i].label == 1) {
-						cat_predict++;
+					int cat_predict = 0;
+					int dog_predict = 0;
+					int chicken_predict = 0;
+					for (int i = 0; i < 10; i++) {
+						if (trainArray[i].label == 1) {
+							cat_predict++;
+						}
+						else if (trainArray[i].label == 2) {
+							dog_predict++;
+						}
+						else if (trainArray[i].label == 3) {
+							chicken_predict++;
+						}
 					}
-					else if (trainArray[i].label == 2) {
-						dog_predict++;
+					if (cat_predict >= dog_predict && cat_predict >= chicken_predict) {
+						//cout << "Du doan la meo" << endl;
+						if (iii >= 1 && iii <= 5) {
+							correct++;
+						}
 					}
-					else if (trainArray[i].label == 3) {
-						chicken_predict++;
+					else if (dog_predict >= cat_predict && dog_predict >= chicken_predict) {
+						//cout << "Du doan la cho" << endl;
+						if (iii >= 6 && iii <= 10) {
+							correct++;
+						}
 					}
+					else if (chicken_predict >= cat_predict && chicken_predict >= dog_predict) {
+						//cout << "Du doan la ga" << endl;
+						if (iii >= 10 && iii <= 15) {
+							correct++;
+						}
+					}
+					/*cout << "Nhap lua chon : " << endl;
+					cin >> type;*/
 				}
-				if (cat_predict >= dog_predict && cat_predict >= chicken_predict) {
-					cout << "Du doan la meo" << endl;
-				}
-				else if (dog_predict >= cat_predict && dog_predict >= chicken_predict) {
-					cout << "Du doan la cho" << endl;
-				}
-				else if (chicken_predict >= cat_predict && chicken_predict >= dog_predict) {
-					cout << "Du doan la ga" << endl;
-				}
-				cout << "Nhap lua chon : " << endl;
-				cin >> type;
+				cout << "du doan dung: " << correct << endl;
 			} while (type != 0);
 		}
 	} while (type != 0);

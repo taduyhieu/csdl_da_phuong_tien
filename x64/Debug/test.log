@@ -1,15 +1,15 @@
 ﻿  test.cpp
-H:\csdl_da_phuong_tien\test.cpp(40,23): warning C4244: '=': conversion from 'float' to '_Tp', possible loss of data
+H:\csdl_da_phuong_tien\test.cpp(124,23): warning C4244: '=': conversion from 'float' to '_Tp', possible loss of data
           with
           [
               _Tp=int
           ]
-H:\csdl_da_phuong_tien\test.cpp(47,21): warning C4244: '=': conversion from 'float' to '_Tp', possible loss of data
+H:\csdl_da_phuong_tien\test.cpp(131,21): warning C4244: '=': conversion from 'float' to '_Tp', possible loss of data
           with
           [
               _Tp=int
           ]
-H:\csdl_da_phuong_tien\test.cpp(99,18): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-H:\csdl_da_phuong_tien\test.cpp(101,18): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-H:\csdl_da_phuong_tien\test.cpp(239,4): warning C4102: 'cv': unreferenced label
+H:\csdl_da_phuong_tien\test.cpp(184,18): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+H:\csdl_da_phuong_tien\test.cpp(186,18): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+H:\csdl_da_phuong_tien\test.cpp(330,4): warning C4102: 'cv': unreferenced label
   test.vcxproj -> H:\csdl_da_phuong_tien\x64\Debug\test.exe
