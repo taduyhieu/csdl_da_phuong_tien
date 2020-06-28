@@ -146,15 +146,15 @@ cv::Mat hand(string src) {
 
 	//crop anh, loai bo nhieu nhat nen trang
 	cv::Mat img_cropped = CropImage(origin_img);
-	//resize ve kich thuoc 64x64
-	cv::Mat img_resize = GetSquareImage(img_cropped, 64);
+	//resize ve kich thuoc 512x512
+	cv::Mat img_resize = GetSquareImage(img_cropped, 512);
 	//chuyen anh RGB thanh grayscale
 	cv::cvtColor(img_resize, img, cv::COLOR_BGR2GRAY);
 
 	// chuyen kieu du lieu unsigned integer sang double de de truy cap den phan tu
 	img.convertTo(img_d, CV_64FC1);
 	// tao vien cho anh
-	cv::copyMakeBorder(img_d, img_pad, 1, 1, 1, 1, BORDER_CONSTANT, 512);
+	cv::copyMakeBorder(img_d, img_pad, 1, 1, 1, 1, BORDER_CONSTANT, 255);
 
 	// Tinh toan gradient
 	cv::Mat dx = Mat::zeros(img_pad.rows - 2, img_pad.cols - 2, CV_64FC1);
@@ -462,7 +462,7 @@ int main(int argc, char* argv[])
 				else if (chicken_predict >= cat_predict && chicken_predict >= dog_predict) {
 					cout << "Du doan la ga" << endl;
 				}
-				cout << "Nhap lua chon :";
+				cout << "Nhap lua chon :" ;
 				cin >> type;
 			} while (type == 2);
 		}

@@ -11,5 +11,5 @@ H:\csdl_da_phuong_tien\test.cpp(129,21): warning C4244: '=': conversion from 'fl
           ]
 H:\csdl_da_phuong_tien\test.cpp(181,18): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
 H:\csdl_da_phuong_tien\test.cpp(183,18): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-H:\csdl_da_phuong_tien\test.cpp(342,4): warning C4102: 'cv': unreferenced label
+H:\csdl_da_phuong_tien\test.cpp(341,4): warning C4102: 'cv': unreferenced label
   test.vcxproj -> H:\csdl_da_phuong_tien\x64\Debug\test.exe
