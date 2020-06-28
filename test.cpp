@@ -146,7 +146,7 @@ cv::Mat hand(string src) {
 
 	//crop anh, loai bo nhieu nhat nen trang
 	cv::Mat img_cropped = CropImage(origin_img);
-	//resize ve kich thuoc 512x512
+	//resize ve kich thuoc 64x64
 	cv::Mat img_resize = GetSquareImage(img_cropped, 64);
 	//chuyen anh RGB thanh grayscale
 	cv::cvtColor(img_resize, img, cv::COLOR_BGR2GRAY);
@@ -154,7 +154,7 @@ cv::Mat hand(string src) {
 	// chuyen kieu du lieu unsigned integer sang double de de truy cap den phan tu
 	img.convertTo(img_d, CV_64FC1);
 	// tao vien cho anh
-	cv::copyMakeBorder(img_d, img_pad, 1, 1, 1, 1, BORDER_CONSTANT, 255);
+	cv::copyMakeBorder(img_d, img_pad, 1, 1, 1, 1, BORDER_CONSTANT, 512);
 
 	// Tinh toan gradient
 	cv::Mat dx = Mat::zeros(img_pad.rows - 2, img_pad.cols - 2, CV_64FC1);
@@ -168,7 +168,7 @@ cv::Mat hand(string src) {
 			dy.at<double>(i - 1, j - 1) = -1 * img_pad.at<double>(i - 1, j) + img_pad.at<double>(i + 1, j);
 			dxy.at<double>(i - 1, j - 1) = sqrt(pow(dx.at<double>(i - 1, j - 1), 2) + pow(dy.at<double>(i - 1, j - 1), 2));
 			if (dx.at<double>(i - 1, j - 1) == 0) {
-				dx.at<double>(i - 1, j - 1) = 1;
+				dx.at<double>(i - 1, j - 1) = 0.000001;
 			}
 			theta.at<double>(i - 1, j - 1) = atan2(dy.at<double>(i - 1, j - 1), dx.at<double>(i - 1, j - 1)) * (180 / PI);
 			if (theta.at<double>(i - 1, j - 1) < 0)
@@ -312,14 +312,13 @@ double calDistanceNorm(cv::Mat feature_first, cv::Mat feature_second) {
 	return distance;
 }
 
-
 int main(int argc, char* argv[])
 {
 	/*cv::Mat feature_1 = hand("test/images/1.jpg");
 	cout << feature_1 << endl;
 	return 0; */
 	/*hand("chicken.11.jpg");
-	return 0;*/
+	return 0;
 	cv::Mat origin_img = imread("test/images/7.jpg");
 	if (!origin_img.data)
 	{
@@ -335,7 +334,7 @@ int main(int argc, char* argv[])
 	namedWindow("Display window", WINDOW_AUTOSIZE);// Create a window for display.
 	imshow("Display window", img);
 	waitKey(0);
-	return 0; 
+	return 0; */
 	label trainArray[100];
 	label temp;
 	int N = 30; // so anh cua moi nhan
@@ -368,14 +367,12 @@ int main(int argc, char* argv[])
 		else if (type == 2) {
 			do {
 				int compare_type;
-				int count = 0;
 				cout << "Nhap file anh test : ";
 				cin >> src_test;
 				cout << "1. Normal | 2. L2Norm | 3.Cosin" << endl;
 				cout << "Chon cong thuc so sanh anh" << endl;
 				cin >> compare_type;
 				cout << "Dang du doan. Vui long cho!" << endl;
-
 				feature_test = hand("test/images/" + src_test);
 				for (int i = 0; i < N; i++) {
 					feature = readFeature("train/features/cat." + to_string(i + 1) + ".yml");
@@ -466,7 +463,7 @@ int main(int argc, char* argv[])
 					cout << "Du doan la ga" << endl;
 				}
 				cout << "Nhap lua chon :";
-				cin >> type;				
+				cin >> type;
 			} while (type == 2);
 		}
 	} while (type != 0);
