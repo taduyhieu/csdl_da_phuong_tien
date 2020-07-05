@@ -444,7 +444,7 @@ int main(int argc, char* argv[])
 				int cat_predict = 0;
 				int dog_predict = 0;
 				int chicken_predict = 0;
-				for (int i = 0; i < 30; i++) {
+				for (int i = 0; i < 10; i++) {
 					if (trainArray[i].label == 1) {
 						cat_predict++;
 					}
