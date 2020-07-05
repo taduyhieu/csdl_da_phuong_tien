@@ -441,10 +441,6 @@ int main(int argc, char* argv[])
 					}
 				}
 
-				/*for (int i = 0; i < 30; i++) {
-					cout << trainArray[i].distance << "   " << trainArray[i].label << endl;
-				}*/
-
 				int cat_predict = 0;
 				int dog_predict = 0;
 				int chicken_predict = 0;
