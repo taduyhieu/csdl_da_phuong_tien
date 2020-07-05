@@ -28,10 +28,8 @@ cv::Mat CropImage(cv::Mat img) {
 	bool check = true;
 	for (int i = 0; i < img.rows; i++) {
 		for (int j = 0; j < img.cols; j++) {
-			int x = (int)img.at<Vec3b>(i, j).val[0];
-			int y = (int)img.at<Vec3b>(i, j).val[1];
-			int z = (int)img.at<Vec3b>(i, j).val[2];
-			if (!(x == 255 && y == 255 && z == 255)) {
+			int x = (int)img.at<uchar>(i, j);
+			if (!(x == 255)) {
 				start_x = i;
 				check = false;
 			}
@@ -47,10 +45,8 @@ cv::Mat CropImage(cv::Mat img) {
 	check = true;
 	for (int j = 0; j < img.cols; j++) {
 		for (int i = 0; i < img.rows; i++) {
-			int x = (int)img.at<Vec3b>(i, j).val[0];
-			int y = (int)img.at<Vec3b>(i, j).val[1];
-			int z = (int)img.at<Vec3b>(i, j).val[2];
-			if (!(x == 255 && y == 255 && z == 255)) {
+			int x = (int)img.at<uchar>(i, j);
+			if (!(x == 255)) {
 				start_y = j;
 				check = false;
 			}
@@ -66,10 +62,8 @@ cv::Mat CropImage(cv::Mat img) {
 	check = true;
 	for (int i = img.rows - 1; i >= 0; i--) {
 		for (int j = img.cols - 1; j >= 0; j--) {
-			int x = (int)img.at<Vec3b>(i, j).val[0];
-			int y = (int)img.at<Vec3b>(i, j).val[1];
-			int z = (int)img.at<Vec3b>(i, j).val[2];
-			if (!(x == 255 && y == 255 && z == 255)) {
+			int x = (int)img.at<uchar>(i, j);
+			if (!(x == 255)) {
 				end_x = i;
 				check = false;
 			}
@@ -85,10 +79,8 @@ cv::Mat CropImage(cv::Mat img) {
 	check = true;
 	for (int j = img.cols - 1; j >= 0; j--) {
 		for (int i = img.rows - 1; i >= 0; i--) {
-			int x = (int)img.at<Vec3b>(i, j).val[0];
-			int y = (int)img.at<Vec3b>(i, j).val[1];
-			int z = (int)img.at<Vec3b>(i, j).val[2];
-			if (!(x == 255 && y == 255 && z == 255)) {
+			int x = (int)img.at<uchar>(i, j);
+			if (!(x == 255)) {
 				end_y = j;
 				check = false;
 			}
@@ -111,7 +103,7 @@ cv::Mat GetSquareImage(const cv::Mat& img, int target_width = 512)
 {
 	int width = img.cols;
 	int	height = img.rows;
-	cv::Mat square = cv::Mat(target_width, target_width, CV_8UC3, cv::Scalar(255, 255, 255));	
+	cv::Mat square = cv::Mat(target_width, target_width, CV_8UC1, cv::Scalar(255));	
 	int max_dim = (width >= height) ? width : height;
 	float scale = ((float)target_width) / max_dim;
 	cv::Rect roi;
@@ -138,18 +130,15 @@ cv::Mat hand(string src) {
 	int start_i, end_i, start_j, end_j;
 
 	// doc anh
-	origin_img = imread(src);
+	origin_img = imread(src, CV_LOAD_IMAGE_GRAYSCALE);
 	if (!origin_img.data)
 	{
 		cout << "Could not open the image" << endl;
 	}
-
 	//crop anh, loai bo nhieu nhat nen trang
 	cv::Mat img_cropped = CropImage(origin_img);
 	//resize ve kich thuoc 512x512
-	cv::Mat img_resize = GetSquareImage(img_cropped, 512);
-	//chuyen anh RGB thanh grayscale
-	cv::cvtColor(img_resize, img, cv::COLOR_BGR2GRAY);
+	img = GetSquareImage(img_cropped, 512);
 
 	// chuyen kieu du lieu unsigned integer sang double de de truy cap den phan tu
 	img.convertTo(img_d, CV_64FC1);
@@ -314,9 +303,22 @@ double calDistanceNorm(cv::Mat feature_first, cv::Mat feature_second) {
 
 int main(int argc, char* argv[])
 {
-	/*cv::Mat feature_1 = hand("test/images/1.jpg");
-	cout << feature_1 << endl;
-	return 0; */
+	// doc anh
+	/*cv::Mat img = imread("ga.jpg", CV_LOAD_IMAGE_GRAYSCALE);
+	if (!img.data)
+	{
+		cout << "Could not open the image" << endl;
+	}
+	
+	cout << img << endl;
+	return 0;*/
+	////crop anh, loai bo nhieu nhat nen trang
+	//cv::Mat img_cropped = CropImage(img);
+	////resize ve kich thuoc 512x512
+	//cv::Mat img_resize = GetSquareImage(img_cropped, 512);
+	//cv::Mat feature1 = hand("train/images/cat.2.jpg");
+	//cout << feature1.size() << endl;
+	//return 0; 
 	/*hand("chicken.11.jpg");
 	return 0;
 	cv::Mat origin_img = imread("test/images/7.jpg");
@@ -366,7 +368,7 @@ int main(int argc, char* argv[])
 		}
 		else if (type == 2) {
 			do {
-				int compare_type;
+				int compare_type;				
 				cout << "Nhap file anh test : ";
 				cin >> src_test;
 				cout << "1. Normal | 2. L2Norm | 3.Cosin" << endl;
@@ -419,7 +421,7 @@ int main(int argc, char* argv[])
 				if (compare_type == 1 || compare_type == 2) {
 					for (int i = 0; i < 3 * N - 1; i++) {
 						for (int j = i + 1; j < 3 * N; j++) {
-							if (trainArray[i].distance >= trainArray[j].distance) {
+							if (trainArray[i].distance > trainArray[j].distance) {
 								temp = trainArray[i];
 								trainArray[i] = trainArray[j];
 								trainArray[j] = temp;
@@ -430,7 +432,7 @@ int main(int argc, char* argv[])
 				else if (compare_type == 3) {
 					for (int i = 0; i < 3 * N - 1; i++) {
 						for (int j = i + 1; j < 3 * N; j++) {
-							if (trainArray[i].distance <= trainArray[j].distance) {
+							if (trainArray[i].distance < trainArray[j].distance) {
 								temp = trainArray[i];
 								trainArray[i] = trainArray[j];
 								trainArray[j] = temp;
@@ -439,10 +441,14 @@ int main(int argc, char* argv[])
 					}
 				}
 
+				/*for (int i = 0; i < 30; i++) {
+					cout << trainArray[i].distance << "   " << trainArray[i].label << endl;
+				}*/
+
 				int cat_predict = 0;
 				int dog_predict = 0;
 				int chicken_predict = 0;
-				for (int i = 0; i < 10; i++) {
+				for (int i = 0; i < 30; i++) {
 					if (trainArray[i].label == 1) {
 						cat_predict++;
 					}
@@ -462,8 +468,8 @@ int main(int argc, char* argv[])
 				else if (chicken_predict >= cat_predict && chicken_predict >= dog_predict) {
 					cout << "Du doan la ga" << endl;
 				}
-				cout << "Nhap lua chon :" ;
-				cin >> type;
+				cout << "Nhap lua chon :";
+				cin >> type;				
 			} while (type == 2);
 		}
 	} while (type != 0);
